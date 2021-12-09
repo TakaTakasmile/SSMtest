@@ -15,7 +15,7 @@ public class AdminController {
     private AdminService adminService;
 
     @RequestMapping("/login.action")
-    public ModelAndView login(String name,String pwd){
+    public ModelAndView login(String name, String pwd){
         ModelAndView mv = new ModelAndView();
         Admin admin = adminService.login(name,pwd);
         if(admin == null){
