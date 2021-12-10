@@ -14,6 +14,19 @@
         <script type="text/javascript" src="${pageContext.request.contextPath }/js/ajaxfileupload.js"></script>
 	</head>
     <script type="text/javascript">
+		$(function (){
+			$.ajax({
+				url:"${pageContext.request.contextPath}/type/ajaxType.action",
+				type:"get",
+				dataType:"json",
+				success:function (resp){
+					$.each(resp,function (n,i){
+						$("#typeSelect").append("<option value='"+i.typeId+"'>"+i.typeName+"</option>");
+					})
+				}
+			})
+		})
+
         function fileChange(){
 			$.ajaxFileUpload({
 				url:"${pageContext.request.contextPath}/prod/ajaxImg.action",
@@ -33,7 +46,6 @@
 					$("#imgDiv").append(imgObj);
 				}
 			});
-
         }
     </script>
 	<body>
@@ -42,7 +54,6 @@
 			<div id="nav">
 				<p>商品管理>新增商品</p>
 			</div>
-
 			<div id="table">
 				<form  id="myform" action="${pageContext.request.contextPath}/prod/save.action">
 					<table>
@@ -96,15 +107,11 @@
 							<td class="four"></td>
 							<td><span id="numerr"></span></td>
 						</tr>
-						
-						
 						<tr>
 							<td class="one">类别</td>
 							<td>
-								<select name="typeId" >
-									<c:forEach items="${typeList}" var="type">
-										<option value="${type.typeId}">${type.typeName}</option>
-									</c:forEach>
+								<select name="typeId" id="typeSelect">
+
 								</select>
 							</td>
 						</tr>
@@ -131,7 +138,5 @@
 				</form>
 			</div>
 		</div>
-
 	</body>
-
 </html>
