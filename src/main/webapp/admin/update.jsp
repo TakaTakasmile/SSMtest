@@ -19,45 +19,46 @@
 				<p>商品管理>更新商品</p>
 			</div>
 			<script type="text/javascript">
-				function fileChange(){//注意：此处不能使用jQuery中的change事件，因此仅触发一次，因此使用标签的：onchange属性
+				$(function (){
+					$.ajax({
+						url:"${pageContext.request.contextPath}/type/ajaxType.action",
+						type:"get",
+						dataType:"json",
+						success:function (resp){
+							$.each(resp,function (n,i){
+								$("#typeSelect").append("<option value='"+i.typeId+"'>"+i.typeName+"</option>");
+							})
+							$("#typeSelect option").each(function (){
+								if($(this).val() == ${prod.typeId}){
+									$(this).attr("selected","selected")
+								}
+							})
+						}
+					})
+				})
 
+				function fileChange(){
 					$.ajaxFileUpload({
-						url: '/prod/ajaxImg.action',//用于文件上传的服务器端请求地址
-						secureuri: false,//一般设置为false
-						fileElementId: 'pimage',//文件上传控件的id属性  <input type="file" id="pimage" name="pimage" />
-						dataType: 'json',//返回值类型 一般设置为json
-						success: function(obj) //服务器成功响应处理函数
-						{
-
-							$("#imgDiv").empty();  //清空原有数据
-							//创建img 标签对象
+						url:"${pageContext.request.contextPath}/prod/ajaxImag.action",
+						secureuri:false,
+						fileElementId:"pimage",
+						dataType:"text/plain",
+						success:function (resp){
 							var imgObj = $("<img>");
-							//给img标签对象追加属性
-							imgObj.attr("src","/image_big/"+obj.imgurl);
-							imgObj.attr("width","100px");
+							imgObj.attr("src","${pageContext.request.contextPath}/image_big/"+resp);
 							imgObj.attr("height","100px");
-							//将图片img标签追加到imgDiv末尾
-							$("#imgDiv").append(imgObj);
-							//将图片的名称（从服务端返回的JSON中取得）赋值给文件本框
-							//$("#imgName").html(data.imgName);
-						},
-						error: function (e)//服务器响应失败处理函数
-						{
-							alert(e.message);
+							imgObj.attr("weight","100px");
+							$("#imgDiv").empty().append(imgObj);
+							$("#imageName").val(resp);
 						}
 					});
 				}
 			</script>
-<script type="text/javascript">
-	function myclose(ispage) {
-		window.location="${pageContext.request.contextPath}/admin/product?flag=split&ispage="+ispage;
-		//window.close();
-	}
-</script>
+
 			<div id="table">
 				<form action="${pageContext.request.contextPath}/prod/update.action" enctype="multipart/form-data" method="post" id="myform">
 					<input type="hidden" value="${prod.pId}" name="pId">
-					<input type="hidden" value="${prod.pImage}" name="pImage">
+					<input type="hidden" value="${prod.pImage}" name="pImage" id="imageName">
 
 					<table>
 						<tr>
@@ -90,10 +91,9 @@
 						
 						<tr>
 							<td class="one">图片介绍</td>
-							<td> <br><div id="imgDiv" style="display:block; width: 40px; height: 50px;"><img src="/image_big/${prod.pImage}" width="100px" height="100px" ></div><br><br><br><br>
+							<td> <br><div id="imgDiv" style="display:block; width: 40px; height: 50px;"><img src="${pageContext.request.contextPath}/image_big/${prod.pImage}" width="100px" height="100px" ></div><br><br><br><br>
 								<input type="file" id="pimage" name="pimage" onchange="fileChange()">
-								<span id="imgName"></span><br>
-
+								<%--<span id="imgName"></span><br>--%>
 							</td>
 						</tr>
 						<tr class="three">
@@ -110,20 +110,12 @@
 							<td class="four"></td>
 							<td><span id="numerr"></span></td>
 						</tr>
-						
-						
+
 						<tr>
 							<td class="one">类别</td>
 							<td>
-								<select name="typeId">
-									<c:forEach items="${typeList}" var="type">
-										<option value="${type.typeId}"
-												<c:if test="${type.typeId==prod.typeId}">
-													selected="selected"
-												</c:if>
-										>${type.typeName}</option>
+								<select name="typeId" id="typeSelect">
 
-									</c:forEach>
 								</select>
 							</td>
 						</tr>
@@ -132,20 +124,22 @@
 							<td class="four"></td>
 							<td><span></span></td>
 						</tr>
-
 						<tr>
 							<td>
 								<input type="submit" value="提交" class="btn btn-success">
 							</td>
 							<td>
-								<input type="reset" value="取消" class="btn btn-default" onclick="myclose(1)">
+								<input type="reset" value="取消" class="btn btn-default" onclick="myclose(${page})">
+								<script type="text/javascript">
+									function myclose(ispage) {
+										window.location="${pageContext.request.contextPath}/prod/split.action?page="+ispage;
+									}
+								</script>
 							</td>
 						</tr>
 					</table>
 				</form>
 			</div>
 		</div>
-
 	</body>
-
 </html>

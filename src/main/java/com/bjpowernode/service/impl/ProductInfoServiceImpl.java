@@ -31,4 +31,19 @@ public class ProductInfoServiceImpl implements ProductInfoService {
         return new PageInfo<>(productInfoList);
     }
 
+    @Override
+    public int addProduct(ProductInfo info) {
+        return productInfoMapper.insert(info);
+    }
+
+    @Override
+    public ProductInfo selectOne(Integer pid) {
+        return productInfoMapper.selectByPrimaryKey(pid);
+    }
+
+    @Override
+    public int update(ProductInfo info) {
+        return productInfoMapper.updateByPrimaryKey(info);
+    }
+
 }

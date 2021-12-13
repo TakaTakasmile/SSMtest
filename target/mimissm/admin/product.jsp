@@ -241,14 +241,9 @@
     }
 
     function one(pid,page) {
-        //取出查询条件
-        var pname = $("#pname").val();
-        var typeid = $("#typeid").val();
-        var lprice = $("#lprice").val();
-        var hprice = $("#hprice").val();
         //向服务器提交请求,传递商品id
-        var str = "?pid="+pid+"&page="+page+"&pname="+pname+"&typeid="+typeid+"&lprice="+lprice+"&hprice="+hprice;
-        location.href = "${pageContext.request.contextPath}/prod/one.action" + str;
+        var str = "pid="+pid+"&page="+page;
+        location.href = "${pageContext.request.contextPath}/prod/one.action?" + str;
     }
 </script>
 <!--分页的AJAX实现-->

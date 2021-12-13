@@ -11,4 +11,10 @@ public interface ProductInfoService {
 
     PageInfo<ProductInfo> splitPage(Integer pageNum,Integer pageSize);
 
+    int addProduct(ProductInfo info);
+
+    ProductInfo selectOne(Integer pid);
+
+    int update(ProductInfo info);
+
 }

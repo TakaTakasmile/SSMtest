@@ -39,6 +39,7 @@
 					imgObj.attr("height","100px");
 					imgObj.attr("weight","100px");
 					$("#imgDiv").empty().append(imgObj);
+					$("#imageName").val(resp);
 				}
 			});
         }
@@ -83,7 +84,8 @@
 						<tr>
 							<td class="three">图片介绍</td>
                             <td> <br><div id="imgDiv" style="display:block; width: 40px; height: 50px;"></div><br><br><br><br>
-                            <input type="file" id="pimage" name="pimage" onchange="fileChange()" >
+                            <input type="file" id="pimage" name="pimage" onchange="fileChange()">
+							<input type="text" name="pImage" id="imageName" hidden>
                                 <%--<span id="imgName" ></span><br>--%>
                             </td>
 						</tr>
