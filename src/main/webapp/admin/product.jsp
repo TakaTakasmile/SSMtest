@@ -24,28 +24,54 @@
     <title>商品界面</title>
 </head>
 <script type="text/javascript">
+    $(function (){
+        $.ajax({
+            url:"${pageContext.request.contextPath}/type/ajaxType.action",
+            dataType:"json",
+            success:function (resp){
+                $.each(resp,function (n,i){
+                    $("#typeid").append("<option value='"+i.typeId+"'>"+i.typeName+"</option>");
+                })
+            }
+        })
+    })
     //全选复选框功能实现
     function allClick() {
-        //获得当前点击后全选按钮的状态
         var flag = $("#all").prop("checked");
-        //将此状态赋值给下面五个复选框
         $("input[name='ck']").each(function () {
             this.checked = flag;
-        });
+        })
     }
 
     //单个复选框点击改变全选复选框功能实现
     function ckClick() {
-        //得到下面五个复选框的个数
-        var fiveLength = $("input[name='ck']").length;
-        //得到下面五个复选框被选中的个数
-        var checkedLength = $("input[name='ck']:checked").length;
-        //进行对比,改变全选复选框的状态
-        if(fiveLength == checkedLength){
+        var total = $("input[name='ck']").length;
+        var checkedBox = $("input[name='ck']:checked").length;
+        if(total == checkedBox){
             $("#all").prop("checked",true);
-        }else{
+        }else {
             $("#all").prop("checked",false);
         }
+    }
+
+    function condition(){
+        var pname = $("#pname").val();
+        var typeid = $("#typeid").val();
+        var lprice = $("#lprice").val();
+        var hprice = $("#hprice").val();
+        $.ajax({
+            url:"${pageContext.request.contextPath}/prod/ajaxCondition.action",
+            type:"post",
+            data:{
+              "pname":pname,
+              "typeid":typeid,
+              "lprice":lprice,
+              "hprice":hprice
+            },
+            success:function (){
+                $("#table").load("${pageContext.request.contextPath}/admin/product.jsp #table");
+            }
+        })
     }
 </script>
 <body>
@@ -57,13 +83,11 @@
         <form id="myform">
             商品名称：<input name="pname" id="pname">&nbsp;&nbsp;&nbsp;
             商品类型：<select name="typeid" id="typeid">
-            <option value="-1">请选择</option>
-            <c:forEach items="${typeList}" var="pt">
-                <option value="${pt.typeId}">${pt.typeName}</option>
-            </c:forEach>
-        </select>&nbsp;&nbsp;&nbsp;
+                        <option value="-1">请选择</option>
+
+                    </select>&nbsp;&nbsp;&nbsp;
             价格：<input name="lprice" id="lprice">-<input name="hprice" id="hprice">
-            <input type="button" value="查询" onclick="condition()">
+                 <input type="button" value="查询" onclick="condition()">
         </form>
     </div>
     <br>
@@ -75,9 +99,7 @@
                 <div id="top">
                     <input type="checkbox" id="all" onclick="allClick()" style="margin-left: 50px">&nbsp;&nbsp;全选
                     <a href="${pageContext.request.contextPath}/admin/addproduct.jsp">
-
-                        <input type="button" class="btn btn-warning" id="btn1"
-                               value="新增商品">
+                        <input type="button" class="btn btn-warning" id="btn1" value="新增商品">
                     </a>
                     <input type="button" class="btn btn-warning" id="btn1"
                            value="批量删除" onclick="deleteBatch()">
@@ -176,42 +198,33 @@
 </body>
 
 <script type="text/javascript">
-    function mysubmit() {
-        $("#myform").submit();
-    }
-
     //批量删除
     function deleteBatch() {
-        //得到所有选中复选框的对象,根据其长度判断是否有选中商品
-        var cks = $("input[name='ck']:checked");  //1,4,5
-        //如果有选中的商品
+        var cks = $("input[name='ck']:checked");
         if(cks.length == 0){
-            alert("请先选择将要删除的商品!");
-        }else{
+            alert("请先选择要删除的商品！");
+        }else {
             var str = "";
             var pid = "";
-            if(confirm("您确定要删除"+cks.length+"条商品吗?")){
-               // alert("可以进行删除!");
-                //获取其value的值,进行字符串拼接
-                $.each(cks,function () {
-                    pid = $(this).val();
-                    //进行非空判断,避免出错
+            if(confirm("您确定要删除"+cks.length+"条商品吗？")){
+                $.each(cks,function (n,i){
+                    pid = this.value;
                     if(pid != null){
-                        str += pid+",";  //145   ===>1,4,5,
+                        str += pid + ",";
                     }
-                });
+                })
 
-                //发送ajax请求,进行批量删除的提交
                 $.ajax({
-                    url:"${pageContext.request.contextPath}/prod/deleteBatch.action",
-                    data:{"pids":str},
-                    type:"post",
-                    dataType:"text",
-                    success:function (msg) {
-                        alert(msg);//批量删除成功!失败!不可删除!
-                        //将页面上显示商品数据的容器重新加载
-                        $("#table").load("http://localhost:8080/admin/product.jsp #table");
-                    }
+                   url:"${pageContext.request.contextPath}/prod/deleteBatch.action",
+                   type:"post",
+                   dataType:"text",
+                   data:{
+                       "pids":str
+                   } ,
+                   success:function (resp){
+                       alert(resp);
+                       $("#table").load("${pageContext.request.contextPath}/admin/product.jsp #table");
+                   }
                 });
             }
         }
@@ -219,25 +232,18 @@
 
     //单个删除
     function del(pid,page) {
-        //弹框提示
-        if (confirm("您确定删除吗?")) {
-            //发出ajax的请求,进行删除操作
-            //取出查询条件
-            var pname = $("#pname").val();
-            var typeid = $("#typeid").val();
-            var lprice = $("#lprice").val();
-            var hprice = $("#hprice").val();
-            $.ajax({
-                url: "${pageContext.request.contextPath}/prod/delete.action",
-                data: {"pid": pid,"page": page,"pname":pname,"typeid":typeid,"lprice":lprice,"hprice":hprice},
-                type: "post",
-                dataType: "text",
-                success: function (msg) {
-                    alert(msg);
-                    $("#table").load("http://localhost:8080/admin/product.jsp #table");
-                }
-            });
-        }
+       if(confirm("确定要删除吗？")){
+           $.ajax({
+               url:"${pageContext.request.contextPath}/prod/delete.action",
+               type:"post",
+               dataType:"text",
+               data:{"pid":pid},
+               success:function (resp){
+                   alert(resp);
+                   $("#table").load("${pageContext.request.contextPath}/admin/product.jsp #table");
+               }
+           });
+       }
     }
 
     function one(pid,page) {

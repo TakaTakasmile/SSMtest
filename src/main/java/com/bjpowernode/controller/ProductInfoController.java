@@ -1,6 +1,7 @@
 package com.bjpowernode.controller;
 
 import com.bjpowernode.pojo.ProductInfo;
+import com.bjpowernode.pojo.vo.ProductInfoVo;
 import com.bjpowernode.service.ProductInfoService;
 import com.bjpowernode.utils.FileNameUtil;
 import com.github.pagehelper.PageInfo;
@@ -18,6 +19,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 @Controller
 @RequestMapping("/prod")
@@ -95,6 +97,45 @@ public class ProductInfoController {
             request.setAttribute("msg","商品更新失败！");
         }
         return "forward:/prod/split.action";
+    }
+
+    @RequestMapping("/delete.action")
+    public String delete(Integer pid,HttpServletRequest request){
+        int res = productInfoService.delete(pid);
+        if(res == 1){
+            request.setAttribute("msg","删除成功！");
+        }else {
+            request.setAttribute("msg","删除失败！");
+        }
+        return "forward:/prod/deleteAjax.action";
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/deleteAjax.action",produces = "text/html;charset=utf-8")
+    public Object deleteSplit(HttpServletRequest request){
+        PageInfo<ProductInfo> info = productInfoService.splitPage(1,PAGE_SIZE);
+        request.getSession().setAttribute("info",info);
+        return request.getAttribute("msg");
+    }
+
+    @RequestMapping("/deleteBatch.action")
+    public String deleteBatch(String pids,HttpServletRequest request){
+        String[] ids= pids.split(",");
+        int res = productInfoService.deleteBatch(ids);
+        if(res > 0){
+            request.setAttribute("msg","批量删除成功！");
+        }else{
+            request.setAttribute("msg","批量删除失败！");
+        }
+        return "forward:/prod/deleteAjax.action";
+    }
+
+    @ResponseBody
+    @RequestMapping("/ajaxCondition.action")
+    public void selectCondition(ProductInfoVo vo,HttpSession session){
+        List<ProductInfo> list = productInfoService.selectCondition(vo);
+        PageInfo<ProductInfo> info = new PageInfo<>(list);
+        session.setAttribute("info",info);
     }
 
 }

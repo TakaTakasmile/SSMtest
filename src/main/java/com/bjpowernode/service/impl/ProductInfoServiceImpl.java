@@ -3,6 +3,7 @@ package com.bjpowernode.service.impl;
 import com.bjpowernode.mapper.ProductInfoMapper;
 import com.bjpowernode.pojo.ProductInfo;
 import com.bjpowernode.pojo.ProductInfoExample;
+import com.bjpowernode.pojo.vo.ProductInfoVo;
 import com.bjpowernode.service.ProductInfoService;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -44,6 +45,21 @@ public class ProductInfoServiceImpl implements ProductInfoService {
     @Override
     public int update(ProductInfo info) {
         return productInfoMapper.updateByPrimaryKey(info);
+    }
+
+    @Override
+    public int delete(Integer pid) {
+        return productInfoMapper.deleteByPrimaryKey(pid);
+    }
+
+    @Override
+    public int deleteBatch(String[] pids) {
+        return productInfoMapper.deleteBatch(pids);
+    }
+
+    @Override
+    public List<ProductInfo> selectCondition(ProductInfoVo vo) {
+        return productInfoMapper.selectCondition(vo);
     }
 
 }

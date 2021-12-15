@@ -1,6 +1,7 @@
 package com.bjpowernode.service;
 
 import com.bjpowernode.pojo.ProductInfo;
+import com.bjpowernode.pojo.vo.ProductInfoVo;
 import com.github.pagehelper.PageInfo;
 
 import java.util.List;
@@ -17,4 +18,9 @@ public interface ProductInfoService {
 
     int update(ProductInfo info);
 
+    int delete(Integer pid);
+
+    int deleteBatch(String[] pids);
+
+    List<ProductInfo> selectCondition(ProductInfoVo vo);
 }
