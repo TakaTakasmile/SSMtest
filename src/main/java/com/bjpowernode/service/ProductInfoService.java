@@ -23,4 +23,6 @@ public interface ProductInfoService {
     int deleteBatch(String[] pids);
 
     List<ProductInfo> selectCondition(ProductInfoVo vo);
+
+    PageInfo<ProductInfo> selectSplit(ProductInfoVo vo,Integer pageSize);
 }

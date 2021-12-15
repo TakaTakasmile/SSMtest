@@ -40,9 +40,16 @@ public class ProductInfoController {
     }*/
 
     @RequestMapping("/split.action")
-    public ModelAndView splitPage(){
+    public ModelAndView splitPage(HttpSession session){
         ModelAndView mv = new ModelAndView();
-        PageInfo<ProductInfo> info = productInfoService.splitPage(1,PAGE_SIZE);
+        PageInfo<ProductInfo> info = null;
+        ProductInfoVo vo = (ProductInfoVo) session.getAttribute("prodvo");
+        if(vo != null){
+            info = productInfoService.selectSplit(vo,PAGE_SIZE);
+            session.removeAttribute("prodvo");
+        }else{
+            info = productInfoService.splitPage(1,PAGE_SIZE);
+        }
         mv.addObject("info",info);
         mv.setViewName("product");
         return mv;
@@ -50,10 +57,18 @@ public class ProductInfoController {
 
     @ResponseBody
     @RequestMapping("/ajaxsplit.action")
-    public void ajaxSplit(Integer page, HttpSession session){
-        PageInfo<ProductInfo> info = productInfoService.splitPage(page,PAGE_SIZE);
+    public void ajaxSplit(ProductInfoVo vo, HttpSession session){
+        PageInfo<ProductInfo> info = productInfoService.selectSplit(vo,PAGE_SIZE);
         session.setAttribute("info",info);
     }
+
+    /*@ResponseBody
+    @RequestMapping("/ajaxCondition.action")
+    public void selectCondition(ProductInfoVo vo,HttpSession session){
+        List<ProductInfo> list = productInfoService.selectCondition(vo);
+        PageInfo<ProductInfo> info = new PageInfo<>(list);
+        session.setAttribute("info",info);
+    }*/
 
     @ResponseBody
     @RequestMapping("/ajaxImag.action")
@@ -79,11 +94,11 @@ public class ProductInfoController {
     }
 
     @RequestMapping("/one.action")
-    public ModelAndView selectOne(Integer pid,Integer page){
+    public ModelAndView selectOne(Integer pid,ProductInfoVo vo,HttpSession session){
         ModelAndView mv = new ModelAndView();
         ProductInfo info = productInfoService.selectOne(pid);
+        session.setAttribute("prodvo",vo);
         mv.addObject("prod",info);
-        mv.addObject("page",page);
         mv.setViewName("update");
         return mv;
     }
@@ -100,10 +115,11 @@ public class ProductInfoController {
     }
 
     @RequestMapping("/delete.action")
-    public String delete(Integer pid,HttpServletRequest request){
+    public String delete(Integer pid,ProductInfoVo vo,HttpServletRequest request){
         int res = productInfoService.delete(pid);
         if(res == 1){
             request.setAttribute("msg","删除成功！");
+            request.getSession().setAttribute("deleteprod",vo);
         }else {
             request.setAttribute("msg","删除失败！");
         }
@@ -113,29 +129,33 @@ public class ProductInfoController {
     @ResponseBody
     @RequestMapping(value = "/deleteAjax.action",produces = "text/html;charset=utf-8")
     public Object deleteSplit(HttpServletRequest request){
-        PageInfo<ProductInfo> info = productInfoService.splitPage(1,PAGE_SIZE);
+        PageInfo<ProductInfo> info = null;
+        ProductInfoVo vo = (ProductInfoVo) request.getSession().getAttribute("deleteprod");
+        if(vo != null){
+            info = productInfoService.selectSplit(vo,PAGE_SIZE);
+            if(info.getList().size() == 0 && vo.getPage() >1){
+                vo.setPage(vo.getPage()-1);
+                info = productInfoService.selectSplit(vo,PAGE_SIZE);
+            }
+            request.getSession().removeAttribute("deleteprod");
+        }else {
+            info = productInfoService.splitPage(1,PAGE_SIZE);
+        }
         request.getSession().setAttribute("info",info);
         return request.getAttribute("msg");
     }
 
     @RequestMapping("/deleteBatch.action")
-    public String deleteBatch(String pids,HttpServletRequest request){
+    public String deleteBatch(String pids,ProductInfoVo vo,HttpServletRequest request){
         String[] ids= pids.split(",");
         int res = productInfoService.deleteBatch(ids);
         if(res > 0){
             request.setAttribute("msg","批量删除成功！");
+            request.getSession().setAttribute("deleteprod",vo);
         }else{
             request.setAttribute("msg","批量删除失败！");
         }
         return "forward:/prod/deleteAjax.action";
-    }
-
-    @ResponseBody
-    @RequestMapping("/ajaxCondition.action")
-    public void selectCondition(ProductInfoVo vo,HttpSession session){
-        List<ProductInfo> list = productInfoService.selectCondition(vo);
-        PageInfo<ProductInfo> info = new PageInfo<>(list);
-        session.setAttribute("info",info);
     }
 
 }

@@ -60,7 +60,7 @@
         var lprice = $("#lprice").val();
         var hprice = $("#hprice").val();
         $.ajax({
-            url:"${pageContext.request.contextPath}/prod/ajaxCondition.action",
+            url:"${pageContext.request.contextPath}/prod/ajaxsplit.action",
             type:"post",
             data:{
               "pname":pname,
@@ -102,7 +102,7 @@
                         <input type="button" class="btn btn-warning" id="btn1" value="新增商品">
                     </a>
                     <input type="button" class="btn btn-warning" id="btn1"
-                           value="批量删除" onclick="deleteBatch()">
+                           value="批量删除" onclick="deleteBatch(${info.pageNum})">
                 </div>
                 <!--显示分页后的商品-->
                 <div id="middle">
@@ -199,13 +199,17 @@
 
 <script type="text/javascript">
     //批量删除
-    function deleteBatch() {
+    function deleteBatch(page) {
         var cks = $("input[name='ck']:checked");
         if(cks.length == 0){
             alert("请先选择要删除的商品！");
         }else {
             var str = "";
             var pid = "";
+            var pname = $("#pname").val();
+            var typeid = $("#typeid").val();
+            var lprice = $("#lprice").val();
+            var hprice = $("#hprice").val();
             if(confirm("您确定要删除"+cks.length+"条商品吗？")){
                 $.each(cks,function (n,i){
                     pid = this.value;
@@ -219,7 +223,12 @@
                    type:"post",
                    dataType:"text",
                    data:{
-                       "pids":str
+                       "pids":str,
+                       "page":page,
+                       "pname":pname,
+                       "typeid":typeid,
+                       "lprice":lprice,
+                       "hprice":hprice
                    } ,
                    success:function (resp){
                        alert(resp);
@@ -233,11 +242,22 @@
     //单个删除
     function del(pid,page) {
        if(confirm("确定要删除吗？")){
+           var pname = $("#pname").val();
+           var typeid = $("#typeid").val();
+           var lprice = $("#lprice").val();
+           var hprice = $("#hprice").val();
            $.ajax({
                url:"${pageContext.request.contextPath}/prod/delete.action",
                type:"post",
                dataType:"text",
-               data:{"pid":pid},
+               data:{
+                   "pid":pid,
+                   "page":page,
+                   "pname":pname,
+                   "typeid":typeid,
+                   "lprice":lprice,
+                   "hprice":hprice
+               },
                success:function (resp){
                    alert(resp);
                    $("#table").load("${pageContext.request.contextPath}/admin/product.jsp #table");
@@ -247,17 +267,31 @@
     }
 
     function one(pid,page) {
+        var pname = $("#pname").val();
+        var typeid = $("#typeid").val();
+        var lprice = $("#lprice").val();
+        var hprice = $("#hprice").val();
         //向服务器提交请求,传递商品id
-        var str = "pid="+pid+"&page="+page;
-        location.href = "${pageContext.request.contextPath}/prod/one.action?" + str;
+        var str = "?pid="+pid+"&page="+page+"&pname="+pname+"&typeid="+typeid+"&lprice="+lprice+"&hprice="+hprice;
+        location.href = "${pageContext.request.contextPath}/prod/one.action" + str;
     }
 </script>
 <!--分页的AJAX实现-->
 <script type="text/javascript">
     function ajaxsplit(page) {
+        var pname = $("#pname").val();
+        var typeid = $("#typeid").val();
+        var lprice = $("#lprice").val();
+        var hprice = $("#hprice").val();
         $.ajax({
             url:"${pageContext.request.contextPath}/prod/ajaxsplit.action",
-            data:{"page":page},
+            data:{
+                "page":page,
+                "pname":pname,
+                "typeid":typeid,
+                "lprice":lprice,
+                "hprice":hprice
+            },
             type:"get",
             success:function(){
                 $("#table").load("${pageContext.request.contextPath}/admin/product.jsp #table");

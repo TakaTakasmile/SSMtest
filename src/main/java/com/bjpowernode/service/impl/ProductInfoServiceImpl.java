@@ -62,4 +62,11 @@ public class ProductInfoServiceImpl implements ProductInfoService {
         return productInfoMapper.selectCondition(vo);
     }
 
+    @Override
+    public PageInfo<ProductInfo> selectSplit(ProductInfoVo vo, Integer pageSize) {
+        PageHelper.startPage(vo.getPage(),pageSize);
+        List<ProductInfo> list = productInfoMapper.selectCondition(vo);
+        return new PageInfo<>(list);
+    }
+
 }

@@ -59,6 +59,7 @@
 				<form action="${pageContext.request.contextPath}/prod/update.action" enctype="multipart/form-data" method="post" id="myform">
 					<input type="hidden" value="${prod.pId}" name="pId">
 					<input type="hidden" value="${prod.pImage}" name="pImage" id="imageName">
+					<input type="hidden" value="${prod.pDate}" name="pDate">
 
 					<table>
 						<tr>
@@ -129,10 +130,10 @@
 								<input type="submit" value="提交" class="btn btn-success">
 							</td>
 							<td>
-								<input type="reset" value="取消" class="btn btn-default" onclick="myclose(${page})">
+								<input type="reset" value="取消" class="btn btn-default" onclick="myclose()">
 								<script type="text/javascript">
-									function myclose(ispage) {
-										window.location="${pageContext.request.contextPath}/prod/split.action?page="+ispage;
+									function myclose() {
+										window.location="${pageContext.request.contextPath}/prod/split.action";
 									}
 								</script>
 							</td>
