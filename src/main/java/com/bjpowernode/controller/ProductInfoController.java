@@ -133,9 +133,9 @@ public class ProductInfoController {
         ProductInfoVo vo = (ProductInfoVo) request.getSession().getAttribute("deleteprod");
         if(vo != null){
             info = productInfoService.selectSplit(vo,PAGE_SIZE);
-            if(info.getList().size() == 0 && vo.getPage() >1){
-                vo.setPage(vo.getPage()-1);
-                info = productInfoService.selectSplit(vo,PAGE_SIZE);
+            if(info.getList().size() == 0){
+                vo.setPage(vo.getPage() - 1);
+                info = productInfoService.selectSplit(vo, PAGE_SIZE);
             }
             request.getSession().removeAttribute("deleteprod");
         }else {
